@@ -60,28 +60,20 @@ def calculate_calorie_limit(personal_data):
 
 
 def get_random_recommendation(vitamin):
-    response = requests.get(f"https://world.openfoodfacts.org/cgi/search.pl?search_terms={vitamin}&search_simple=1&action=process&json=1")
-    if response.status_code == 200:
-        search_data = response.json()
-        if search_data['count'] > 0:
-            recommendations = [product['product_name'] for product in search_data['products'] if 'product_name' in product]
-            if recommendations:
-                return random.choice(recommendations)
-    return 'Keine Empfehlung verfügbar'
+    recommendations = {
+        'vitamin_a': ['Karotten', 'Süßkartoffeln', 'Spinat', 'Kürbis'],
+        'vitamin_b1': ['Vollkornprodukte', 'Schweinefleisch', 'Hülsenfrüchte', 'Nüsse'],
+        'vitamin_c': ['Orangen', 'Paprika', 'Brokkoli', 'Erdbeeren'],
+        'vitamin_d': ['Sonnenlicht', 'Fisch', 'Eier', 'Pilze'],
+    }
+    return random.choice(recommendations.get(vitamin, ['Keine Empfehlung verfügbar']))
 
 
 def evaluate_data(personal_data, food_data):
     total_calories = sum(item['kalorien'] for item in food_data)
     all_vitamins = {vit for item in food_data for vit in item['vitamine']}
     
-    vitamin_recommendations = {
-        'vitamin_a': 'Karotten, Süßkartoffeln',
-        'vitamin_b1': 'Vollkornprodukte, Fleisch',
-        'vitamin_c': 'Orangen, Paprika',
-        'vitamin_d': 'Sonnenlicht, Fisch',
-    }
-    
-    vitamin_deficiencies = [vit for vit in vitamin_recommendations.keys() if vit not in all_vitamins]
+    vitamin_deficiencies = [vit for vit in ['vitamin_a', 'vitamin_b1', 'vitamin_c', 'vitamin_d'] if vit not in all_vitamins]
 
     kaloriengrenze = calculate_calorie_limit(personal_data)
 
